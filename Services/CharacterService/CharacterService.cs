@@ -8,10 +8,7 @@ namespace dotnet_rpg.Services.CharacterService
 {
   public class CharacterService : ICharacterService
   {
-    private static List<Character> characters = new List<Character> {
-        new Character(),
-        new Character { Id = 1, Name = "Sam" }
-    };
+    
     private readonly IMapper mapper;
     private readonly DataContext context;
 
@@ -32,6 +29,8 @@ namespace dotnet_rpg.Services.CharacterService
       serviceResponse.Data = await context.Characters
         .Select(c => mapper.Map<GetCharacterDto>(c))
         .ToListAsync();
+      
+      serviceResponse.Message = $"New character with id '{character.Id}' successfully added.";
 
       return serviceResponse;
     }
@@ -42,17 +41,19 @@ namespace dotnet_rpg.Services.CharacterService
 
       try
       {
-        var character = characters.FirstOrDefault(c => c.Id == id);
+        var character = await context.Characters.FirstOrDefaultAsync(c => c.Id == id);
         if (character is null)
         {
           throw new Exception($"Character with Id '{id}' not found.");
         }
 
-        characters.Remove(character);
+        context.Characters.Remove(character);
+        await context.SaveChangesAsync();
 
-        serviceResponse.Data = characters
+        serviceResponse.Data = await context.Characters
           .Select(c => mapper.Map<GetCharacterDto>(c))
-          .ToList();
+          .ToListAsync();
+        serviceResponse.Message = $"Character with Id '{id}' successfully deleted.";
       }
       catch (Exception ex)
       {
@@ -109,6 +110,7 @@ namespace dotnet_rpg.Services.CharacterService
 
         await context.SaveChangesAsync();
         serviceResponse.Data = mapper.Map<GetCharacterDto>(character);
+        serviceResponse.Message = $"Character with Id '{updatedCharacter.Id}' successfully updated.";
       }
       catch (Exception ex)
       {
