@@ -36,7 +36,7 @@ namespace dotnet_rpg.Data
       await context.SaveChangesAsync();
       
       serviceResponse.Data = user.Id;
-      serviceResponse.Message = $"User ${user.Username} successfully created";
+      serviceResponse.Message = $"User '{user.Username}' successfully created";
 
       return serviceResponse;
     }
