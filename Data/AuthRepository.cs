@@ -10,7 +10,7 @@ namespace dotnet_rpg.Data
     private readonly DataContext context;
     public AuthRepository(DataContext context)
     {
-      this.context = context;
+      this.context = context; 
     }
     public async Task<ServiceResponse<string>> Login(string username, string password)
     {
